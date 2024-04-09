@@ -34,9 +34,21 @@ front_magazine:
     federation: "%default_federation_options%"
     content: "%default_content_options%"
 
+front_sub:
+  controller: App\Controller\Entry\EntryFrontController::front_redirect
+  defaults: { subscription: home, sortBy: hot, time: '∞', type: all, federation: all, content: threads }
+  path: /{subscription}/{sortBy}/{time}/{type}/{federation}
+  methods: [GET]
+  requirements:
+    subscription: "%default_subscription_options%"
+    sortBy: "%default_sort_options%"
+    time: "%default_time_options%"
+    type: "%default_type_options%"
+    federation: "%default_federation_options%"
+
 front_content:
   controller: App\Controller\Entry\EntryFrontController::front_redirect
-  defaults: { sortBy: hot, time: '∞', type: all, federation: all, content: threads }
+  defaults: { subscription: home, sortBy: hot, time: '∞', type: all, federation: all, content: threads }
   path: /{content}/{sortBy}/{time}/{type}/{federation}
   methods: [GET]
   requirements:
