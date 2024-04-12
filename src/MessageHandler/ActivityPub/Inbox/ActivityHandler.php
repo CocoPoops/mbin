@@ -94,7 +94,7 @@ readonly class ActivityHandler
 
         if ('Announce' === $payload['type']) {
             $actor = $this->manager->findActorOrCreate($payload['actor']);
-            if ($actor instanceof Magazine && $actor->lastOriginUpdate < (new \DateTime())->modify('-1 hour')) {
+            if ($actor instanceof Magazine && $actor->lastOriginUpdate < (new \DateTime())->modify('-1 minute')) {
                 $actor->lastOriginUpdate = new \DateTime();
                 $this->entityManager->persist($actor);
                 $this->entityManager->flush();
