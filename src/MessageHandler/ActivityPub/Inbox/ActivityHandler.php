@@ -93,12 +93,6 @@ readonly class ActivityHandler
         }
 
         if ('Announce' === $payload['type']) {
-            $actor = $this->manager->findActorOrCreate($payload['actor']);
-            if ($actor instanceof Magazine && $actor->lastOriginUpdate < (new \DateTime())->modify('-1 minute')) {
-                $actor->lastOriginUpdate = new \DateTime();
-                $this->entityManager->persist($actor);
-                $this->entityManager->flush();
-            }
             // we check for an array here, because boosts are announces with an url (string) as the object
             if (\is_array($payload['object'])) {
                 $payload = $payload['object'];
@@ -112,6 +106,13 @@ readonly class ActivityHandler
                         return;
                     }
                 }
+            }
+        } elseif ('Create' === $payload['type']) {
+            $actor = $this->manager->findActorOrCreate($payload['actor']);
+            if ($actor instanceof Magazine && $actor->lastOriginUpdate < (new \DateTime())->modify('-3 hours')) {
+                $actor->lastOriginUpdate = new \DateTime();
+                $this->entityManager->persist($actor);
+                $this->entityManager->flush();
             }
         }
 
