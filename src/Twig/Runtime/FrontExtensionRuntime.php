@@ -22,21 +22,44 @@ class FrontExtensionRuntime implements RuntimeExtensionInterface
         string $name,
         ?string $value,
         string $routeName = null,
-        array $additionalParams = [],
+        array $additionalParams = []
     ): string {
         $request = $this->requestStack->getCurrentRequest();
         $attrs = $request->attributes;
         $route = $routeName ?? $attrs->get('_route');
-
-        $params = array_merge($attrs->get('_route_params', []), $request->query->all());
-        $params = array_replace($params, $additionalParams);
-        $params = array_filter($params, fn ($v) => null !== $v);
-
+    
+        // Merge current route parameters with query parameters and additional parameters
+        $params = array_merge(
+            $attrs->get('_route_params', []),
+            $request->query->all(),
+            $additionalParams
+        );
+    
+        // Filter out null values and set the new value for the specified parameter
+        $params = array_filter($params, fn($v) => null !== $v);
         $params[$name] = $value;
-
+    
+        // Determine the correct route based on the 'front' prefix and '_magazine' exclusion
         if (str_starts_with($route, 'front') && !str_contains($route, '_magazine')) {
             $route = $this->getFrontRoute($route, $params);
         }
+    
+        // Logic to switch between 'front_magazine' and 'front_magazine_full'
+        $defaultParams = [
+            'content' => 'threads',
+            'sortBy' => 'hot',
+            'time' => '∞',
+            'federation' => 'all'
+        ];
+    
+        $currentParams = array_intersect_key($params, $defaultParams);
+        $differences = array_diff_assoc($currentParams, $defaultParams);
+    
+        if (empty($differences) && $route === 'front_magazine_full') {
+            $route = 'front_magazine';
+        } elseif (!empty($differences) && $route === 'front_magazine') {
+            $route = 'front_magazine_full';
+        }elseif (str_contains($route, '_magazine')){$route = 'front_magazine_full';}
 
         return $this->urlGenerator->generate($route, $params);
     }

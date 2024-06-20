@@ -265,29 +265,48 @@ class UrlExtensionRuntime implements RuntimeExtensionInterface
     // $additionalParams indicates extra parameters to set in addition to [$name] = $value
     // Set $value to null to indicate deleting a parameter
     // TODO: It'd be better to have just a single $params which is an associative array
-    public function optionsUrl(string $name, ?string $value, string $routeName = null, array $additionalParams = []): string
-    {
-        $route = $routeName ?? $this->requestStack->getCurrentRequest()->attributes->get('_route');
-        $params = $this->requestStack->getCurrentRequest()->attributes->get('_route_params', []);
-
-        $queryParams = $this->requestStack->getCurrentRequest()->query->all();
-        if (\is_array($queryParams)) {
-            $params = array_merge($params, $queryParams);
-        }
-
-        // Apply logic for additionalParams: set if value is not null, unset if value is null
-        foreach ($additionalParams as $key => $val) {
-            if (null !== $val) {
-                // Set or update the parameter
-                $params[$key] = $val;
-            } else {
-                // Unset the parameter if value is null
-                unset($params[$key]);
-            }
-        }
-
+    public function optionsUrl(
+        string $name,
+        ?string $value,
+        string $routeName = null,
+        array $additionalParams = []
+    ): string {
+        $request = $this->requestStack->getCurrentRequest();
+        $attrs = $request->attributes;
+        $route = $routeName ?? $attrs->get('_route');
+    
+        // Merge current route parameters with query parameters and additional parameters
+        $params = array_merge(
+            $attrs->get('_route_params', []),
+            $request->query->all(),
+            $additionalParams
+        );
+    
+        // Filter out null values and set the new value for the specified parameter
+        $params = array_filter($params, fn($v) => null !== $v);
         $params[$name] = $value;
+    
+        // Logic to switch between 'front_magazine' and 'front_magazine_full'
+        $defaultParams = [
+            'sortBy' => 'hot',
+            'time' => '∞',
+        ];
+    
+        $currentParams = array_intersect_key($params, $defaultParams);
+        $differences = array_diff_assoc($currentParams, $defaultParams);
+    
+        if (empty($differences) && $route === 'domain_entries_full') {
+            $route = 'domain_entries';
+        } elseif (!empty($differences) && $route === 'domain_entries') {
+            $route = 'domain_entries_full';
+        }
 
+        if (empty($differences) && $route === 'front_magazine_full') {
+            $route = 'front_magazine';
+        } elseif (!empty($differences) && $route === 'front_magazine') {
+            $route = 'front_magazine_full';
+        }elseif (str_contains($route, '_magazine')){$route = 'front_magazine_full';}
+    
         return $this->urlGenerator->generate($route, $params);
     }
 

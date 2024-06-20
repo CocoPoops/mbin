@@ -21,7 +21,7 @@
         <a href="
             {% if magazine is defined and magazine %}
                 {% if is_route_name_starts_with('front') %}
-                    {{ options_url('content', 'threads', 'front_magazine', {'name': magazine.name, 'p': null}) }}
+                    {{ options_url('content', 'threads', 'front_magazine_full', {'name': magazine.name, 'p': null}) }}
                 {% else %}
                     {{ navbar_threads_url(magazine) }}
                 {% endif %}
@@ -40,7 +40,7 @@
         <a href="
             {% if magazine is defined and magazine %}
                 {% if is_route_name_starts_with('front') %}
-                    {{ options_url('content', 'microblog', 'front_magazine', {'name': magazine.name,'p': null,'type':null}) }}
+                    {{ options_url('content', 'microblog', 'front_magazine_full', {'name': magazine.name,'p': null,'type':null}) }}
                 {% else %}
                     {{ navbar_posts_url(magazine) }}
                 {% endif %}
