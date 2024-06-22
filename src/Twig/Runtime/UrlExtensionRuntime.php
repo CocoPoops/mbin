@@ -288,6 +288,7 @@ class UrlExtensionRuntime implements RuntimeExtensionInterface
     
         // Logic to switch between 'front_magazine' and 'front_magazine_full'
         $defaultParams = [
+            'content' => 'threads',
             'sortBy' => 'hot',
             'time' => '∞',
         ];
@@ -305,7 +306,7 @@ class UrlExtensionRuntime implements RuntimeExtensionInterface
             $route = 'front_magazine';
         } elseif (!empty($differences) && $route === 'front_magazine') {
             $route = 'front_magazine_full';
-        }elseif (str_contains($route, '_magazine')){$route = 'front_magazine_full';}
+        }
     
         return $this->urlGenerator->generate($route, $params);
     }

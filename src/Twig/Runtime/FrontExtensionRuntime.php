@@ -59,7 +59,7 @@ class FrontExtensionRuntime implements RuntimeExtensionInterface
             $route = 'front_magazine';
         } elseif (!empty($differences) && $route === 'front_magazine') {
             $route = 'front_magazine_full';
-        }elseif (str_contains($route, '_magazine')){$route = 'front_magazine_full';}
+        }
 
         return $this->urlGenerator->generate($route, $params);
     }
