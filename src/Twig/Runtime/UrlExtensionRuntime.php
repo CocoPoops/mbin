@@ -291,6 +291,7 @@ class UrlExtensionRuntime implements RuntimeExtensionInterface
             'content' => 'threads',
             'sortBy' => 'hot',
             'time' => '∞',
+            'federation' => 'all'
         ];
     
         $currentParams = array_intersect_key($params, $defaultParams);
