@@ -7,6 +7,7 @@ namespace App\MessageHandler\ActivityPub\Inbox;
 use App\Entity\Magazine;
 use App\Entity\User;
 use App\Exception\InboxForwardingException;
+use App\Exception\InvalidUserPublicKeyException;
 use App\Message\ActivityPub\Inbox\ActivityMessage;
 use App\Message\ActivityPub\Inbox\AddMessage;
 use App\Message\ActivityPub\Inbox\AnnounceMessage;
@@ -54,6 +55,10 @@ readonly class ActivityHandler
                 $this->bus->dispatch(new ActivityMessage($body));
 
                 return;
+            } catch (InvalidUserPublicKeyException $exception) {
+                $this->logger->warning("Unable to extract public key for '{user}'.", ['user' => $exception->apProfileId]);
+
+                return;
             }
         }
 
@@ -63,10 +68,10 @@ readonly class ActivityHandler
 
         try {
             if (isset($payload['actor']) || isset($payload['attributedTo'])) {
-                if (!$this->verifyInstanceDomain($payload['actor'] ?? $payload['attributedTo'])) {
+                if (!$this->verifyInstanceDomain($payload['actor'] ?? $this->manager->getActorFromAttributedTo($payload['attributedTo']))) {
                     return;
                 }
-                $user = $this->manager->findActorOrCreate($payload['actor'] ?? $payload['attributedTo']);
+                $user = $this->manager->findActorOrCreate($payload['actor'] ?? $this->manager->getActorFromAttributedTo($payload['attributedTo']));
             } else {
                 if (!$this->verifyInstanceDomain($payload['id'])) {
                     return;
@@ -134,6 +139,7 @@ readonly class ActivityHandler
             case 'Page':
             case 'Article':
             case 'Question':
+            case 'Video':
                 $this->bus->dispatch(new CreateMessage($payload));
                 // no break
             case 'Announce':
