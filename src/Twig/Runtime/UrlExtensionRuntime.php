@@ -268,7 +268,7 @@ class UrlExtensionRuntime implements RuntimeExtensionInterface
     public function optionsUrl(
         string $name,
         ?string $value,
-        string $routeName = null,
+        ?string $routeName = null,
         array $additionalParams = []
     ): string {
         $request = $this->requestStack->getCurrentRequest();
