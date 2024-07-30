@@ -448,6 +448,8 @@ toolbar.mention: Mention
 federation_page_enabled: Federation page enabled
 federation_page_allowed_description: Known instances we federate with
 federation_page_disallowed_description: Instances we do not federate with
+federation_page_dead_title: Dead instances
+federation_page_dead_description: Instances that we could not deliver at least 10 activities in a row and where the last successful deliver was more than a week ago
 federated_search_only_loggedin: Federated search limited if not logged in
 sidebar_sections_local_only: Restrict "Random X" and "Active People" sections to local
   only
@@ -825,6 +827,15 @@ related_entry: Related
 restrict_magazine_creation: Restrict local magazine creation to admins and global mods
 sso_show_first: Show SSO first on login and registration pages
 continue_with: Continue with
+reported_user: Reported user
+reporting_user: Reporting user
+reported: reported
+report_subject: Subject
+own_report_rejected: Your report was rejected
+own_report_accepted: Your report was accepted
+own_content_reported_accepted: A report of your content was accepted.
+report_accepted: A report was accepted
+open_report: open report
 cake_day: Cake day
 someone: Someone
 back: Back
@@ -836,3 +847,30 @@ last_updated: Last updated
 and: and
 direct_message: Direct message
 manually_approves_followers: Manually approves followers
+register_push_notifications_button: Register For Push Notifications
+unregister_push_notifications_button: Remove Push Registration
+test_push_notifications_button: Test Push Notifications
+test_push_message: Hello World!
+notification_title_new_comment: New comment
+notification_title_removed_comment: A comment was removed
+notification_title_edited_comment: A comment was edited
+notification_title_mention: You were mentioned
+notification_title_new_reply: New Reply
+notification_title_new_thread: New thread
+notification_title_removed_thread: A thread was removed
+notification_title_edited_thread: A thread was edited
+notification_title_ban: You were banned
+notification_title_message: New direct message
+notification_title_new_post: New Post
+notification_title_removed_post: A post was removed
+notification_title_edited_post: A post was edited
+show_related_magazines: Show random magazines
+show_related_entries: Show random threads
+show_related_posts: Show random posts
+show_active_users: Show active users
+notification_title_new_report: A new report was created
+server_software: Server software
+version: Version
+last_successful_deliver: Last successful deliver
+last_successful_receive: Last successful receive
+last_failed_contact: Last failed contact

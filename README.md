@@ -83,17 +83,17 @@ For developers:
                 </a>
             </td>
             <td align="center">
-                <a href="https://github.com/asdfzdfj">
-                    <img src="https://avatars.githubusercontent.com/u/20770492?v=4" width="100;" alt="asdfzdfj"/>
-                    <br />
-                    <sub><b>asdfzdfj</b></sub>
-                </a>
-            </td>
-            <td align="center">
                 <a href="https://github.com/BentiGorlich">
                     <img src="https://avatars.githubusercontent.com/u/25664458?v=4" width="100;" alt="BentiGorlich"/>
                     <br />
                     <sub><b>BentiGorlich</b></sub>
+                </a>
+            </td>
+            <td align="center">
+                <a href="https://github.com/asdfzdfj">
+                    <img src="https://avatars.githubusercontent.com/u/20770492?v=4" width="100;" alt="asdfzdfj"/>
+                    <br />
+                    <sub><b>asdfzdfj</b></sub>
                 </a>
             </td>
             <td align="center">
@@ -252,13 +252,6 @@ For developers:
                 </a>
             </td>
             <td align="center">
-                <a href="https://github.com/WebVoid">
-                    <img src="https://avatars.githubusercontent.com/u/5394649?v=4" width="100;" alt="WebVoid"/>
-                    <br />
-                    <sub><b>Webvoid</b></sub>
-                </a>
-            </td>
-            <td align="center">
                 <a href="https://github.com/comradekingu">
                     <img src="https://avatars.githubusercontent.com/u/13802408?v=4" width="100;" alt="comradekingu"/>
                     <br />
@@ -270,6 +263,13 @@ For developers:
                     <img src="https://avatars.githubusercontent.com/u/31551856?v=4" width="100;" alt="CSDUMMI"/>
                     <br />
                     <sub><b>CSDUMMI</b></sub>
+                </a>
+            </td>
+            <td align="center">
+                <a href="https://github.com/DismalShadowX">
+                    <img src="https://avatars.githubusercontent.com/u/24910097?v=4" width="100;" alt="DismalShadowX"/>
+                    <br />
+                    <sub><b>Nathan Sparrow</b></sub>
                 </a>
             </td>
             <td align="center">

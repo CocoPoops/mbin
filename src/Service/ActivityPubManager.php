@@ -12,6 +12,7 @@ use App\Entity\Contracts\ActivityPubActorInterface;
 use App\Entity\Entry;
 use App\Entity\EntryComment;
 use App\Entity\Image;
+use App\Entity\Instance;
 use App\Entity\Magazine;
 use App\Entity\Moderator;
 use App\Entity\Post;
@@ -28,6 +29,7 @@ use App\Message\DeleteUserMessage;
 use App\Repository\ApActivityRepository;
 use App\Repository\EntryRepository;
 use App\Repository\ImageRepository;
+use App\Repository\InstanceRepository;
 use App\Repository\MagazineRepository;
 use App\Repository\UserRepository;
 use App\Service\ActivityPub\ApHttpClient;
@@ -67,6 +69,8 @@ class ActivityPubManager
         private readonly RateLimiterFactory $apUpdateActorLimiter,
         private readonly EntryRepository $entryRepository,
         private readonly EntryManager $entryManager,
+        private readonly RemoteInstanceManager $remoteInstanceManager,
+        private readonly InstanceRepository $instanceRepository,
     ) {
     }
 
@@ -139,7 +143,7 @@ class ActivityPubManager
             if (!substr_count(ltrim($actorUrl, '@'), '@')) {
                 $user = $this->userRepository->findOneBy(['username' => ltrim($actorUrl, '@')]);
                 if ($user instanceof User) {
-                    if ($user->apId && (!$user->apFetchedAt || $user->apFetchedAt->modify('+1 hour') < (new \DateTime()))) {
+                    if ($user->apId && !$user->isDeleted && !$user->isSoftDeleted() && !$user->isTrashed() && (!$user->apFetchedAt || $user->apFetchedAt->modify('+1 hour') < (new \DateTime()))) {
                         $this->dispatchUpdateActor($user->apProfileId);
                     }
 
@@ -165,7 +169,7 @@ class ActivityPubManager
         $user = $this->userRepository->findOneBy(['apProfileId' => $actorUrl]);
         if ($user instanceof User) {
             $this->logger->debug('found remote user for url "{url}" in db', ['url' => $actorUrl]);
-            if ($user->apId && (!$user->apFetchedAt || $user->apFetchedAt->modify('+1 hour') < (new \DateTime()))) {
+            if ($user->apId && !$user->isDeleted && !$user->isSoftDeleted() && !$user->isTrashed() && (!$user->apFetchedAt || $user->apFetchedAt->modify('+1 hour') < (new \DateTime()))) {
                 $this->dispatchUpdateActor($user->apProfileId);
             }
 
@@ -174,7 +178,7 @@ class ActivityPubManager
         $magazine = $this->magazineRepository->findOneBy(['apProfileId' => $actorUrl]);
         if ($magazine instanceof Magazine) {
             $this->logger->debug('found remote user for url "{url}" in db', ['url' => $actorUrl]);
-            if (!$magazine->apFetchedAt || $magazine->apFetchedAt->modify('+1 hour') < (new \DateTime())) {
+            if (!$magazine->isTrashed() && !$magazine->isSoftDeleted() && (!$magazine->apFetchedAt || $magazine->apFetchedAt->modify('+1 hour') < (new \DateTime()))) {
                 $this->dispatchUpdateActor($magazine->apProfileId);
             }
 
@@ -271,7 +275,7 @@ class ActivityPubManager
             ? ':'.parse_url($id, PHP_URL_PORT)
             : '';
 
-        return sprintf(
+        return \sprintf(
             '%s@%s%s',
             $this->apHttpClient->getActorObject($id)['preferredUsername'],
             parse_url($id, PHP_URL_HOST),
@@ -309,6 +313,10 @@ class ActivityPubManager
     {
         $this->logger->info('updating user {name}', ['name' => $actorUrl]);
         $user = $this->userRepository->findOneBy(['apProfileId' => $actorUrl]);
+
+        if ($user->isDeleted || $user->isTrashed() || $user->isSoftDeleted()) {
+            return $user;
+        }
 
         $actor = $this->apHttpClient->getActorObject($actorUrl);
         if (!$actor || !\is_array($actor)) {
@@ -383,6 +391,14 @@ class ActivityPubManager
                 }
             }
 
+            if (null !== $user->apId) {
+                $instance = $this->instanceRepository->findOneBy(['domain' => $user->apDomain]);
+                if (null === $instance) {
+                    $instance = new Instance($user->apDomain);
+                }
+                $this->remoteInstanceManager->updateInstance($instance);
+            }
+
             // Write to DB
             $this->entityManager->flush();
 
@@ -451,6 +467,10 @@ class ActivityPubManager
     {
         $this->logger->info('updating magazine "{magName}"', ['magName' => $actorUrl]);
         $magazine = $this->magazineRepository->findOneBy(['apProfileId' => $actorUrl]);
+
+        if ($magazine->isTrashed() || $magazine->isSoftDeleted()) {
+            return $magazine;
+        }
 
         $actor = $this->apHttpClient->getActorObject($actorUrl);
         // Check if actor isn't empty (not set/null/empty array/etc.)
@@ -525,6 +545,13 @@ class ActivityPubManager
                 $this->handleMagazineFeaturedCollection($actorUrl, $magazine);
             }
 
+            if (null !== $magazine->apId) {
+                $instance = $this->instanceRepository->findOneBy(['domain' => $magazine->apDomain]);
+                if (null === $instance) {
+                    $instance = new Instance($magazine->apDomain);
+                }
+                $this->remoteInstanceManager->updateInstance($instance);
+            }
             $this->entityManager->flush();
 
             return $magazine;
@@ -794,7 +821,7 @@ class ActivityPubManager
     {
         $potentialGroups = self::getReceivers($object);
         $magazine = $this->magazineRepository->findByApGroupProfileId($potentialGroups);
-        if ($magazine and $magazine->apId && (!$magazine->apFetchedAt || $magazine->apFetchedAt->modify('+1 Day') < (new \DateTime()))) {
+        if ($magazine and $magazine->apId && !$magazine->isTrashed() && !$magazine->isSoftDeleted() && (!$magazine->apFetchedAt || $magazine->apFetchedAt->modify('+1 Day') < (new \DateTime()))) {
             $this->dispatchUpdateActor($magazine->apPublicUrl);
         }
 

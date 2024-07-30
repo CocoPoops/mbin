@@ -29,7 +29,7 @@ Install prequirements:
 sudo apt-get install lsb-release ca-certificates curl wget unzip gnupg apt-transport-https software-properties-common python3-launchpadlib git redis-server postgresql postgresql-contrib nginx acl -y
 ```
 
-On **Ubuntu 22.04 LTS** or older, prepare latest PHP package repositoy (8.2) by using a Ubuntu PPA (this step is optional for Ubuntu 23.10 or later) via:
+On **Ubuntu 22.04 LTS** or older, prepare latest PHP package repositoy (8.2 or 8.3) by using a Ubuntu PPA (this step is optional for Ubuntu 23.10 or later) via:
 
 ```bash
 sudo add-apt-repository ppa:ondrej/php -y
@@ -41,11 +41,20 @@ On **Debian 12** or later, you can install the latest PHP package repository (th
 sudo sh -c 'echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
 ```
 
-Install PHP 8.2 with some important PHP extensions:
+You can choose between PHP 8.2 or 8.3, but it is recommended to use PHP 8.3.
+
+Install _PHP 8.2_ with some important PHP extensions:
 
 ```bash
 sudo apt-get update
-sudo apt-get install php8.2 php8.2-common php8.2-fpm php8.2-cli php8.2-amqp php8.2-pgsql php8.2-gd php8.2-curl php8.2-xml php8.2-redis php8.2-mbstring php8.2-zip php8.2-bz2 php8.2-intl php8.2-bcmath -y
+sudo apt-get install php8.2 php8.2-common php8.2-fpm php8.2-cli php8.2-amqp php8.2-bcmath php8.2-pgsql php8.2-gd php8.2-curl php8.2-xml php8.2-redis php8.2-mbstring php8.2-zip php8.2-bz2 php8.2-intl php8.2-bcmath -y
+```
+
+Or install _PHP 8.3_ with PHP extensions:
+
+```bash
+sudo apt-get update
+sudo apt-get install php8.3 php8.3-common php8.3-fpm php8.3-cli php8.3-amqp php8.3-bcmath php8.3-pgsql php8.3-gd php8.3-curl php8.3-xml php8.3-redis php8.3-mbstring php8.3-zip php8.3-bz2 php8.3-intl php8.3-bcmath -y
 ```
 
 Install Composer:
@@ -98,6 +107,7 @@ sudo su - mbin
 
 ```bash
 sudo mkdir -p /var/www/mbin
+cd /var/www/mbin
 sudo chown mbin:www-data /var/www/mbin
 ```
 
@@ -122,6 +132,7 @@ git clone https://github.com/MbinOrg/mbin.git .
 ### Create & configure media directory
 
 ```bash
+cd /var/www/mbin
 mkdir public/media
 sudo chmod -R 775 public/media
 sudo chown -R mbin:www-data public/media
@@ -223,10 +234,12 @@ OAUTH_ENCRYPTION_KEY=<Hex string generated in previous step>
 Edit some PHP settings within your `php.ini` file:
 
 ```bash
-sudo nano /etc/php/8.2/fpm/php.ini
+sudo nano /etc/php/8.3/fpm/php.ini
 ```
 
 ```ini
+; Maximum execution time of each script, in seconds
+max_execution_time = 60
 ; Both max file size and post body size are personal preferences
 upload_max_filesize = 8M
 post_max_size = 8M
@@ -257,7 +270,7 @@ More info: [Symfony Performance docs](https://symfony.com/doc/current/performanc
 Edit your PHP `www.conf` file as well, to increase the amount of PHP child processes (optional):
 
 ```bash
-sudo nano /etc/php/8.2/fpm/pool.d/www.conf
+sudo nano /etc/php/8.3/fpm/pool.d/www.conf
 ```
 
 With the content (these are personal preferences, adjust to your needs):
@@ -308,6 +321,9 @@ composer clear-cache
 ### Caching
 
 You can choose between either Redis or KeyDB.
+
+> [!TIP]
+> More Redis/KeyDB fine-tuning settings can be found in the [Redis configuration guide](../02-configuration/redis.md).
 
 #### Redis
 
@@ -419,21 +435,29 @@ php bin/console doctrine:migrations:migrate
 ## Team RabbitMQ's main signing key
 curl -1sLf "https://keys.openpgp.org/vks/v1/by-fingerprint/0A9AF2115F4687BD29803A206B73A36E6026DFCA" | sudo gpg --dearmor | sudo tee /usr/share/keyrings/com.rabbitmq.team.gpg > /dev/null
 ## Community mirror of Cloudsmith: modern Erlang repository
-curl -1sLf https://ppa1.novemberain.com/gpg.E495BB49CC4BBE5B.key | sudo gpg --dearmor | sudo tee /usr/share/keyrings/rabbitmq.E495BB49CC4BBE5B.gpg > /dev/null
+curl -1sLf https://github.com/rabbitmq/signing-keys/releases/download/3.0/cloudsmith.rabbitmq-erlang.E495BB49CC4BBE5B.key | sudo gpg --dearmor | sudo tee /usr/share/keyrings/rabbitmq.E495BB49CC4BBE5B.gpg > /dev/null
 ## Community mirror of Cloudsmith: RabbitMQ repository
-curl -1sLf https://ppa1.novemberain.com/gpg.9F4587F226208342.key | sudo gpg --dearmor | sudo tee /usr/share/keyrings/rabbitmq.9F4587F226208342.gpg > /dev/null
+curl -1sLf https://github.com/rabbitmq/signing-keys/releases/download/3.0/cloudsmith.rabbitmq-server.9F4587F226208342.key | sudo gpg --dearmor | sudo tee /usr/share/keyrings/rabbitmq.9F4587F226208342.gpg > /dev/null
 
 ## Add apt repositories maintained by Team RabbitMQ
 sudo tee /etc/apt/sources.list.d/rabbitmq.list <<EOF
 ## Provides modern Erlang/OTP releases
 ##
-deb [signed-by=/usr/share/keyrings/rabbitmq.E495BB49CC4BBE5B.gpg] https://ppa1.novemberain.com/rabbitmq/rabbitmq-erlang/deb/ubuntu jammy main
+deb [arch=amd64 signed-by=/usr/share/keyrings/rabbitmq.E495BB49CC4BBE5B.gpg] https://ppa1.novemberain.com/rabbitmq/rabbitmq-erlang/deb/ubuntu jammy main
 deb-src [signed-by=/usr/share/keyrings/rabbitmq.E495BB49CC4BBE5B.gpg] https://ppa1.novemberain.com/rabbitmq/rabbitmq-erlang/deb/ubuntu jammy main
+
+# another mirror for redundancy
+deb [arch=amd64 signed-by=/usr/share/keyrings/rabbitmq.E495BB49CC4BBE5B.gpg] https://ppa2.novemberain.com/rabbitmq/rabbitmq-erlang/deb/ubuntu jammy main
+deb-src [signed-by=/usr/share/keyrings/rabbitmq.E495BB49CC4BBE5B.gpg] https://ppa2.novemberain.com/rabbitmq/rabbitmq-erlang/deb/ubuntu jammy main
 
 ## Provides RabbitMQ
 ##
-deb [signed-by=/usr/share/keyrings/rabbitmq.9F4587F226208342.gpg] https://ppa1.novemberain.com/rabbitmq/rabbitmq-server/deb/ubuntu jammy main
+deb [arch=amd64 signed-by=/usr/share/keyrings/rabbitmq.9F4587F226208342.gpg] https://ppa1.novemberain.com/rabbitmq/rabbitmq-server/deb/ubuntu jammy main
 deb-src [signed-by=/usr/share/keyrings/rabbitmq.9F4587F226208342.gpg] https://ppa1.novemberain.com/rabbitmq/rabbitmq-server/deb/ubuntu jammy main
+
+# another mirror for redundancy
+deb [arch=amd64 signed-by=/usr/share/keyrings/rabbitmq.9F4587F226208342.gpg] https://ppa2.novemberain.com/rabbitmq/rabbitmq-server/deb/ubuntu jammy main
+deb-src [signed-by=/usr/share/keyrings/rabbitmq.9F4587F226208342.gpg] https://ppa2.novemberain.com/rabbitmq/rabbitmq-server/deb/ubuntu jammy main
 EOF
 
 ## Update package indices
