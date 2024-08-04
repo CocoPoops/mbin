@@ -44,6 +44,7 @@ class MagazineFactory
             $dto->description,
             $dto->rules,
             $dto->isAdult,
+            $dto->isPostingRestrictedToMods,
             $dto->icon
         );
     }
@@ -63,6 +64,7 @@ class MagazineFactory
         $dto->postCount = $magazine->postCount;
         $dto->postCommentCount = $magazine->postCommentCount;
         $dto->isAdult = $magazine->isAdult;
+        $dto->isPostingRestrictedToMods = $magazine->postingRestrictedToMods;
         $dto->tags = $magazine->tags;
         $dto->badges = $magazine->badges;
         $dto->moderators = $magazine->moderators;

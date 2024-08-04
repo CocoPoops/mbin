@@ -364,7 +364,10 @@ class ActivityPubManager
 
             // Only update avatar if icon is set
             if (isset($actor['icon'])) {
-                $newImage = $this->handleImages([$actor['icon']]);
+                // we only have to wrap the property in an array if it is not already an array, though that is not that easy to determine
+                // because each json object is an associative array -> each image has to have a 'type' property so use that to check it
+                $icon = !\array_key_exists('type', $actor['icon']) ? $actor['icon'] : [$actor['icon']];
+                $newImage = $this->handleImages($icon);
                 if ($user->avatar && $newImage !== $user->avatar) {
                     $this->bus->dispatch(new DeleteImageMessage($user->avatar->getId()));
                 }
@@ -373,7 +376,10 @@ class ActivityPubManager
 
             // Only update cover if image is set
             if (isset($actor['image'])) {
-                $newImage = $this->handleImages([$actor['image']]);
+                // we only have to wrap the property in an array if it is not already an array, though that is not that easy to determine
+                // because each json object is an associative array -> each image has to have a 'type' property so use that to check it
+                $cover = !\array_key_exists('type', $actor['image']) ? $actor['image'] : [$actor['image']];
+                $newImage = $this->handleImages($cover);
                 if ($user->cover && $newImage !== $user->cover) {
                     $this->bus->dispatch(new DeleteImageMessage($user->cover->getId()));
                 }
@@ -387,7 +393,7 @@ class ActivityPubManager
                         $user->apFollowersCount = $followersObj['totalItems'];
                         $user->updateFollowCounts();
                     }
-                } catch (InvalidApPostException $ignored) {
+                } catch (InvalidApPostException|InvalidArgumentException $ignored) {
                 }
             }
 
@@ -419,11 +425,20 @@ class ActivityPubManager
 
         if (\count($images)) {
             try {
-                if ($tempFile = $this->imageManager->download($images[0]['url'])) {
+                $imageObject = $images[0];
+                if (isset($imageObject['height'])) {
+                    // determine the highest resolution image
+                    foreach ($images as $i) {
+                        if (isset($i['height']) && $i['height'] ?? 0 > $imageObject['height'] ?? 0) {
+                            $imageObject = $i;
+                        }
+                    }
+                }
+                if ($tempFile = $this->imageManager->download($imageObject['url'])) {
                     $image = $this->imageRepository->findOrCreateFromPath($tempFile);
-                    $image->sourceUrl = $images[0]['url'];
-                    if ($image && isset($images[0]['name'])) {
-                        $image->altText = $images[0]['name'];
+                    $image->sourceUrl = $imageObject['url'];
+                    if ($image && isset($imageObject['name'])) {
+                        $image->altText = $imageObject['name'];
                     }
                     $this->entityManager->persist($image);
                     $this->entityManager->flush();
@@ -488,7 +503,10 @@ class ActivityPubManager
             }
 
             if (isset($actor['icon'])) {
-                $newImage = $this->handleImages([$actor['icon']]);
+                // we only have to wrap the property in an array if it is not already an array, though that is not that easy to determine
+                // because each json object is an associative array -> each image has to have a 'type' property so use that to check it
+                $icon = !\array_key_exists('type', $actor['icon']) ? $actor['icon'] : [$actor['icon']];
+                $newImage = $this->handleImages($icon);
                 if ($magazine->icon && $newImage !== $magazine->icon) {
                     $this->bus->dispatch(new DeleteImageMessage($magazine->icon->getId()));
                 }
@@ -524,6 +542,7 @@ class ActivityPubManager
             $magazine->apTimeoutAt = null;
             $magazine->apFetchedAt = new \DateTime();
             $magazine->isAdult = $actor['sensitive'] ?? false;
+            $magazine->postingRestrictedToMods = filter_var($actor['postingRestrictedToMods'] ?? false, FILTER_VALIDATE_BOOLEAN) ?? false;
 
             if (null !== $magazine->apFollowersUrl) {
                 try {
@@ -533,16 +552,22 @@ class ActivityPubManager
                         $magazine->apFollowersCount = $followersObj['totalItems'];
                         $magazine->updateSubscriptionsCount();
                     }
-                } catch (InvalidApPostException $ignored) {
+                } catch (InvalidApPostException|InvalidArgumentException $ignored) {
                 }
             }
 
             if (null !== $magazine->apAttributedToUrl) {
-                $this->handleModeratorCollection($actorUrl, $magazine);
+                try {
+                    $this->handleModeratorCollection($actorUrl, $magazine);
+                } catch (InvalidArgumentException $ignored) {
+                }
             }
 
             if (null !== $magazine->apFeaturedUrl) {
-                $this->handleMagazineFeaturedCollection($actorUrl, $magazine);
+                try {
+                    $this->handleMagazineFeaturedCollection($actorUrl, $magazine);
+                } catch (InvalidArgumentException $ignored) {
+                }
             }
 
             if (null !== $magazine->apId) {
