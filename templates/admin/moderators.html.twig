@@ -50,7 +50,7 @@
     {% endif %}
     <div class="section moderator-add">
         <div class="container">
-            {{ form_start(form) }}
+            {{ form_start(form, {'attr': {'data-turbo': 'false'}}) }}
             <div class="row">
                 {{ form_errors(form.user) }}
             </div>
