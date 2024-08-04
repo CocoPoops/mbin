@@ -46,7 +46,20 @@
 
         {% include 'entry/comment/_options.html.twig' %}
 
-        <div id="comments">
+                
+        {%- set linkoffset = '3.25' -%}
+        
+        {% if FIXED_NAVBAR is same as V_TRUE %}
+            {%- set linkoffset = linkoffset + '3.25' -%}
+        {% endif %}
+
+        {% if TOPBAR is same as V_TRUE %}
+            {%- set linkoffset = linkoffset + '1.25' -%}
+        {% endif %}
+
+        {% include 'entry/comment/_options.html.twig' %}
+
+        <div id="comments" style="scroll-margin-top: {{ linkoffset }}rem">
             {% include 'entry/comment/_list.html.twig' %}
         </div>
 
