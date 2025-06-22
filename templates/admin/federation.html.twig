@@ -16,7 +16,7 @@
     {% include 'admin/_options.html.twig' %}
     <div class="section" id="content">
         <div class="container">
-            {{ form_start(form) }}
+            {{ form_start(form, {'attr': {'data-turbo': 'false'}}) }}
             {{ form_row(form.instances, {label: 'banned_instances'}) }}
             <div class="actions">
                 {{ form_row(form.submit, { 'label': 'save'|trans, attr: {class: 'btn btn__primary'} }) }}

@@ -34,6 +34,13 @@ front_short:
 front_magazine:
   controller: App\Controller\Entry\EntryFrontController::magazine
   defaults: &front_magazine_defaults { content: threads, sortBy: default, time: '∞', federation: all }
+  path: /m/{name}/
+  methods: [GET]
+  requirements: *front_requirement
+
+front_magazine_full:
+  controller: App\Controller\Entry\EntryFrontController::magazine
+  defaults: &front_magazine_full_defaults { content: threads, sortBy: default, time: '∞', federation: all }
   path: /m/{name}/{content}/{sortBy}/{time}/{federation}
   methods: [GET]
   requirements: *front_requirement

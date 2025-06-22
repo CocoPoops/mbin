@@ -44,6 +44,23 @@ class FrontExtensionRuntime implements RuntimeExtensionInterface
             $route = $this->getFrontRoute($route, $params);
         }
 
+        // Logic to switch between 'front_magazine' and 'front_magazine_full'
+        $defaultParams = [
+            'content' => 'threads',
+            'sortBy' => 'hot',
+            'time' => '∞',
+            'federation' => 'all',
+        ];
+
+        $currentParams = array_intersect_key($params, $defaultParams);
+        $differences = array_diff_assoc($currentParams, $defaultParams);
+
+        if (empty($differences) && 'front_magazine_full' === $route) {
+            $route = 'front_magazine';
+        } elseif (!empty($differences) && 'front_magazine' === $route) {
+            $route = 'front_magazine_full';
+        }
+
         return $this->urlGenerator->generate($route, $params);
     }
 

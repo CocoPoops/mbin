@@ -3,36 +3,42 @@
     {% set theme_key = constant('App\\Controller\\User\\ThemeSettingsController::KBIN_THEME') %}
     <a href="{{ path('theme_settings', {key: theme_key, value: 'kbin'}) }}"
        title="{{ 'kbin' }} {{ 'theme'|trans }}"
+       data-turbo="false"
        aria-label="{{ 'kbin' }} {{ 'theme'|trans }}"
        rel="nofollow">
         <div class="theme kbin"></div>
     </a>
     <a href="{{ path('theme_settings', {key: theme_key, value: 'light'}) }}"
        title="{{ 'light'|trans }} {{ 'theme'|trans }}"
+       data-turbo="false"
        aria-label="{{ 'light'|trans }} {{ 'theme'|trans }}"
        rel="nofollow">
         <div class="theme light"></div>
     </a>
     <a href="{{ path('theme_settings', {key: theme_key, value: 'dark'}) }}"
        title="{{ 'dark'|trans }} {{ 'theme'|trans }}"
+       data-turbo="false"
        aria-label="{{ 'dark'|trans }} {{ 'theme'|trans }}"
        rel="nofollow">
         <div class="theme dark"></div>
     </a>
     <a href="{{ path('theme_settings', {key: theme_key, value: 'solarized-light'}) }}"
        title="{{ 'solarized_light'|trans }} {{ 'theme'|trans }}"
+       data-turbo="false"
        aria-label="{{ 'solarized_light'|trans }} {{ 'theme'|trans }}"
        rel="nofollow">
         <div class="theme solarized-light"></div>
     </a>
     <a href="{{ path('theme_settings', {key: theme_key, value: 'solarized-dark'}) }}"
        title="{{ 'solarized_dark'|trans }} {{ 'theme'|trans }}"
+       data-turbo="false"
        aria-label="{{ 'solarized_dark'|trans }} {{ 'theme'|trans }}"
        rel="nofollow">
         <div class="theme solarized-dark"></div>
     </a>
     <a href="{{ path('theme_settings', {key: theme_key, value: 'tokyo-night'}) }}"
        title="{{ 'tokyo_night'|trans }} {{ 'theme'|trans }}"
+       data-turbo="false"
        aria-label="{{ 'tokyo_night'|trans }} {{ 'theme'|trans }}"
        rel="nofollow">
         <div class="theme tokyo-night"></div>

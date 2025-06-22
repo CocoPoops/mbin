@@ -23,7 +23,7 @@ class NavbarExtensionRuntime implements RuntimeExtensionInterface
         if ($this->isRouteNameStartsWith('front')) {
             return $this->frontExtension->frontOptionsUrl(
                 'content', 'threads',
-                $magazine instanceof Magazine ? 'front_magazine' : 'front',
+                $magazine instanceof Magazine ? 'front_magazine_full' : 'front',
                 ['name' => $magazine?->name, 'p' => null],
             );
         }

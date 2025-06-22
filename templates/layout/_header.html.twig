@@ -167,7 +167,7 @@
                                 </a>
                             </li>
                         {% endif %}
-                        <li><a href="{{ logout_path() }}">{{ 'logout'|trans }}</a></li>
+                        <li><a data-turbo="false" href="{{ logout_path() }}">{{ 'logout'|trans }}</a></li>
                     </ul>
                 </li>
             {% else %}

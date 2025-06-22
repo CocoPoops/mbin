@@ -20,7 +20,7 @@
     <div id="content" class="section">
         <div class="container">
             <h1 hidden>{{ 'general'|trans }}</h1>
-            {{ form_start(form) }}
+            {{ form_start(form, {'attr': {'data-turbo': 'false'}}) }}
             <h2>{{ 'appearance'|trans }}</h2>
             {{ form_row(form.homepage, {label: 'homepage'}) }}
             {{ form_row(form.frontDefaultSort, {label: 'front_default_sort'}) }}

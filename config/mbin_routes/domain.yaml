@@ -1,6 +1,15 @@
 domain_entries:
   controller: App\Controller\Domain\DomainFrontController
   defaults: { sortBy: hot, time: '∞'}
+  path: /d/{name}/
+  methods: [ GET ]
+  requirements:
+    sortBy: "%default_sort_options%"
+    time: "%default_time_options%"
+
+domain_entries_full:
+  controller: App\Controller\Domain\DomainFrontController
+  defaults: { sortBy: hot, time: '∞'}
   path: /d/{name}/{sortBy}/{time}
   methods: [ GET ]
   requirements:
