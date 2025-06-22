@@ -100,6 +100,7 @@
         "symfony/uid": "7.2.*",
         "symfony/ux-autocomplete": "^2.18.0",
         "symfony/ux-chartjs": "^2.18.0",
+        "symfony/ux-turbo": "^2.26",
         "symfony/ux-twig-component": "^2.18.1",
         "symfony/validator": "7.2.*",
         "symfony/webpack-encore-bundle": "^2.1.1",
